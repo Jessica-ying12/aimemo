@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Build output
+out/
+release/
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Data (runtime)
+data/
+
+# Logs
+*.log
+logs/
+
+# Test coverage
+coverage/
+
+# Certificates
+*.p12
+*.cer
+*.pem
+
+# === 私密文档（不提交到公开仓库） ===
+docx/requirements/
+docx/tasks/
+docx/standards/
+docx/learning/
+docx/proposals/
+docx/README.md
