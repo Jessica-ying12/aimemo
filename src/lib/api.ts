@@ -10,7 +10,18 @@ import type {
   UpdateNoteInput,
 } from '../../shared/types';
 
-const { invoke } = window.electronAPI;
+const { invoke: rawInvoke } = window.electronAPI;
+
+async function invoke<T>(channel: string, ...args: unknown[]): Promise<T> {
+  const response = await rawInvoke<{ success: boolean; data?: T; error?: string }>(
+    channel,
+    ...args,
+  );
+  if (!response.success) {
+    throw new Error(response.error || 'Unknown error');
+  }
+  return response.data as T;
+}
 
 export const api = {
   conversations: {
