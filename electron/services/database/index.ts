@@ -28,6 +28,7 @@ export function initDatabase(): Database.Database {
   db.pragma('journal_mode = WAL');
   db.pragma('synchronous = NORMAL');
   db.pragma('foreign_keys = ON');
+  db.pragma('busy_timeout = 5000');
 
   runMigrations(db);
 
@@ -36,6 +37,7 @@ export function initDatabase(): Database.Database {
 
 export function closeDatabase() {
   if (db) {
+    db.pragma('optimize');
     db.close();
     db = null;
   }

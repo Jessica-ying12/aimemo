@@ -61,30 +61,42 @@ export const conversationsDB = {
     const id = uuid();
     const now = new Date().toISOString();
 
-    db.prepare(
-      `INSERT INTO conversations (id, source, title, raw_content, created_at, imported_at, status, metadata)
-      VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`,
-    ).run(
-      id,
-      input.source,
-      input.title || '',
-      JSON.stringify(input.rawContent),
-      now,
-      now,
-      input.metadata ? JSON.stringify(input.metadata) : null,
-    );
+    const createTransaction = db.transaction(() => {
+      db.prepare(
+        `INSERT INTO conversations (id, source, title, raw_content, created_at, imported_at, status, metadata)
+        VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`,
+      ).run(
+        id,
+        input.source,
+        input.title || '',
+        JSON.stringify(input.rawContent),
+        now,
+        now,
+        input.metadata ? JSON.stringify(input.metadata) : null,
+      );
 
-    db.prepare(
-      `INSERT INTO conversations_fts(rowid, title, raw_content, summary)
-      SELECT rowid, title, raw_content, summary FROM conversations WHERE id = ?`,
-    ).run(id);
+      db.prepare(
+        `INSERT INTO conversations_fts(rowid, title, raw_content, summary)
+        SELECT rowid, title, raw_content, summary FROM conversations WHERE id = ?`,
+      ).run(id);
+    });
 
+    createTransaction();
     return this.get(id)!;
   },
 
   delete(id: string): void {
     const db = getDatabase();
-    db.prepare('DELETE FROM conversations WHERE id = ?').run(id);
+
+    const deleteTransaction = db.transaction(() => {
+      const row = db.prepare('SELECT rowid FROM conversations WHERE id = ?').get(id) as any;
+      if (row) {
+        db.prepare('DELETE FROM conversations_fts WHERE rowid = ?').run(row.rowid);
+      }
+      db.prepare('DELETE FROM conversations WHERE id = ?').run(id);
+    });
+
+    deleteTransaction();
   },
 
   search(query: string, limit = 20): Conversation[] {

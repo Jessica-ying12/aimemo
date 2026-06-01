@@ -51,68 +51,90 @@ export const notesDB = {
     const id = uuid();
     const now = new Date().toISOString();
 
-    db.prepare(
-      `INSERT INTO notes (id, conversation_id, title, content, category, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, 'draft', ?, ?)`,
-    ).run(
-      id,
-      input.conversationId || null,
-      input.title,
-      input.content,
-      input.category || null,
-      now,
-      now,
-    );
+    const createTransaction = db.transaction(() => {
+      db.prepare(
+        `INSERT INTO notes (id, conversation_id, title, content, category, status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, 'draft', ?, ?)`,
+      ).run(
+        id,
+        input.conversationId || null,
+        input.title,
+        input.content,
+        input.category || null,
+        now,
+        now,
+      );
 
-    if (input.tags?.length) {
-      const tagStmt = db.prepare('INSERT OR IGNORE INTO note_tags (note_id, tag_id) VALUES (?, ?)');
-      for (const tagId of input.tags) {
-        tagStmt.run(id, tagId);
+      if (input.tags?.length) {
+        const tagStmt = db.prepare(
+          'INSERT OR IGNORE INTO note_tags (note_id, tag_id) VALUES (?, ?)',
+        );
+        for (const tagId of input.tags) {
+          tagStmt.run(id, tagId);
+        }
       }
-    }
 
-    db.prepare(
-      `INSERT INTO notes_fts(rowid, title, content)
-      SELECT rowid, title, content FROM notes WHERE id = ?`,
-    ).run(id);
+      db.prepare(
+        `INSERT INTO notes_fts(rowid, title, content)
+        SELECT rowid, title, content FROM notes WHERE id = ?`,
+      ).run(id);
+    });
 
+    createTransaction();
     return this.get(id)!;
   },
 
   update(id: string, input: UpdateNoteInput): Note | null {
     const db = getDatabase();
     const now = new Date().toISOString();
-    const sets: string[] = ['updated_at = ?'];
-    const bindings: unknown[] = [now];
 
-    if (input.title !== undefined) {
-      sets.push('title = ?');
-      bindings.push(input.title);
-    }
-    if (input.content !== undefined) {
-      sets.push('content = ?');
-      bindings.push(input.content);
-    }
-    if (input.category !== undefined) {
-      sets.push('category = ?');
-      bindings.push(input.category);
-    }
-    if (input.status !== undefined) {
-      sets.push('status = ?');
-      bindings.push(input.status);
-    }
+    const updateTransaction = db.transaction(() => {
+      const sets: string[] = ['updated_at = ?'];
+      const bindings: unknown[] = [now];
 
-    bindings.push(id);
-    db.prepare(`UPDATE notes SET ${sets.join(', ')} WHERE id = ?`).run(...bindings);
-
-    if (input.tags !== undefined) {
-      db.prepare('DELETE FROM note_tags WHERE note_id = ?').run(id);
-      const tagStmt = db.prepare('INSERT OR IGNORE INTO note_tags (note_id, tag_id) VALUES (?, ?)');
-      for (const tagId of input.tags) {
-        tagStmt.run(id, tagId);
+      if (input.title !== undefined) {
+        sets.push('title = ?');
+        bindings.push(input.title);
       }
-    }
+      if (input.content !== undefined) {
+        sets.push('content = ?');
+        bindings.push(input.content);
+      }
+      if (input.category !== undefined) {
+        sets.push('category = ?');
+        bindings.push(input.category);
+      }
+      if (input.status !== undefined) {
+        sets.push('status = ?');
+        bindings.push(input.status);
+      }
 
+      bindings.push(id);
+      db.prepare(`UPDATE notes SET ${sets.join(', ')} WHERE id = ?`).run(...bindings);
+
+      if (input.tags !== undefined) {
+        db.prepare('DELETE FROM note_tags WHERE note_id = ?').run(id);
+        const tagStmt = db.prepare(
+          'INSERT OR IGNORE INTO note_tags (note_id, tag_id) VALUES (?, ?)',
+        );
+        for (const tagId of input.tags) {
+          tagStmt.run(id, tagId);
+        }
+      }
+
+      if (input.title !== undefined || input.content !== undefined) {
+        const row = db.prepare('SELECT rowid FROM notes WHERE id = ?').get(id) as any;
+        if (row) {
+          db.prepare('DELETE FROM notes_fts WHERE rowid = ?').run(row.rowid);
+          db.prepare(
+            `INSERT INTO notes_fts(rowid, title, content)
+            SELECT rowid, title, content FROM notes WHERE id = ?`,
+          ).run(id);
+        }
+      }
+    });
+
+    updateTransaction();
     return this.get(id);
   },
 
