@@ -18,8 +18,9 @@ function createWindow() {
     trafficLightPosition: { x: 16, y: 16 },
   });
 
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL('http://localhost:5173');
+  const rendererUrl = process.env['ELECTRON_RENDERER_URL'];
+  if (rendererUrl) {
+    mainWindow.loadURL(rendererUrl);
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
