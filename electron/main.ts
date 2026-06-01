@@ -27,7 +27,8 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  initDatabase();
+  const dbPath = join(app.getPath('userData'), 'data', 'aimemo.db');
+  initDatabase(dbPath);
   registerIpcHandlers();
   createWindow();
 

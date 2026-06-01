@@ -1,7 +1,6 @@
 import Database from 'better-sqlite3';
-import { app } from 'electron';
-import { join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
+import { dirname } from 'path';
 import { runMigrations } from './migrator';
 
 let db: Database.Database | null = null;
@@ -13,15 +12,12 @@ export function getDatabase(): Database.Database {
   return db;
 }
 
-export function initDatabase(): Database.Database {
-  const userDataPath = app.getPath('userData');
-  const dbDir = join(userDataPath, 'data');
+export function initDatabase(dbPath: string): Database.Database {
+  const dbDir = dirname(dbPath);
 
   if (!existsSync(dbDir)) {
     mkdirSync(dbDir, { recursive: true });
   }
-
-  const dbPath = join(dbDir, 'aimemo.db');
 
   db = new Database(dbPath);
 
