@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import { ConversationListPage } from './pages/ConversationListPage';
+import { ConversationDetailPage } from './pages/ConversationDetailPage';
 import { ImportPage } from './pages/ImportPage';
 import { SearchPage } from './pages/SearchPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -19,7 +20,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<ConversationListPage />} />
-          <Route path="conversation/:id" element={<div>对话详情</div>} />
+          <Route path="conversation/:id" element={<ConversationDetailPage />} />
           <Route path="import" element={<ImportPage />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="settings" element={<SettingsPage />} />
