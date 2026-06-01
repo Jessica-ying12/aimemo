@@ -1,8 +1,22 @@
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import { Layout } from './components/layout/Layout';
+import { ConversationListPage } from './pages/ConversationListPage';
+import { ImportPage } from './pages/ImportPage';
+import { SearchPage } from './pages/SearchPage';
+import { SettingsPage } from './pages/SettingsPage';
+
 function App() {
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-white">AIMemo</h1>
-    </div>
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<ConversationListPage />} />
+          <Route path="import" element={<ImportPage />} />
+          <Route path="search" element={<SearchPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
+      </Routes>
+    </HashRouter>
   );
 }
 
