@@ -47,4 +47,8 @@ export const api = {
     create: (name: string, color?: string) => invoke<Tag>(IPC_CHANNELS.TAG_CREATE, name, color),
     delete: (id: string) => invoke<void>(IPC_CHANNELS.TAG_DELETE, id),
   },
+  import: {
+    paste: (text: string) => invoke<Conversation>('import:paste', text),
+    file: () => invoke<Conversation[] | null>('import:file'),
+  },
 };

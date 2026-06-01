@@ -10,6 +10,9 @@ import { IPC_CHANNELS } from '../shared/ipc-channels';
 import { conversationsDB } from './services/database/conversations';
 import { notesDB } from './services/database/notes';
 import { tagsDB } from './services/database/tags';
+import { dialog } from 'electron';
+import { readFile } from 'fs/promises';
+import { parseRawText, parseJSON, parseJSONL, parseMarkdown } from './services/parser';
 
 export function registerIpcHandlers() {
   // 对话
@@ -83,5 +86,52 @@ export function registerIpcHandlers() {
   registerHandler(IPC_CHANNELS.TAG_DELETE, (id: string) => {
     if (!id || typeof id !== 'string') throw new Error('Invalid ID');
     return tagsDB.delete(id);
+  });
+
+  // 导入
+  registerHandler('import:paste', (text: string) => {
+    if (!text || typeof text !== 'string') throw new Error('Invalid text');
+    const result = parseRawText(text);
+    return conversationsDB.create({
+      source: result.source,
+      title: result.title,
+      rawContent: result.messages,
+    });
+  });
+
+  registerHandler('import:file', async () => {
+    const { filePaths, canceled } = await dialog.showOpenDialog({
+      properties: ['openFile', 'multiSelections'],
+      filters: [{ name: '对话文件', extensions: ['json', 'jsonl', 'md', 'txt'] }],
+    });
+
+    if (canceled || !filePaths.length) return null;
+
+    const results = [];
+    for (const filePath of filePaths) {
+      const content = await readFile(filePath, 'utf-8');
+      const ext = filePath.split('.').pop()?.toLowerCase();
+
+      let parsed;
+      if (ext === 'json') {
+        parsed = parseJSON(content);
+      } else if (ext === 'jsonl') {
+        parsed = parseJSONL(content);
+      } else if (ext === 'md') {
+        parsed = parseMarkdown(content);
+      } else {
+        parsed = parseRawText(content);
+      }
+
+      const conversation = conversationsDB.create({
+        source: parsed.source,
+        title: parsed.title,
+        rawContent: parsed.messages,
+        metadata: { importedFrom: filePath },
+      });
+      results.push(conversation);
+    }
+
+    return results;
   });
 }
