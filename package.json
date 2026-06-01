@@ -2,12 +2,16 @@
   "name": "aimemo",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "out/main/index.js",
   "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "typecheck": "tsc --noEmit",
+    "postinstall": "electron-builder install-app-deps",
     "prepare": "husky"
   },
   "lint-staged": {

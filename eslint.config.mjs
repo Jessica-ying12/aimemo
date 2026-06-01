@@ -24,6 +24,10 @@ export default [
         clearTimeout: 'readonly',
         setInterval: 'readonly',
         clearInterval: 'readonly',
+        document: 'readonly',
+        window: 'readonly',
+        Electron: 'readonly',
+        NodeJS: 'readonly',
       },
     },
     plugins: {
