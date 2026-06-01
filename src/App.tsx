@@ -19,6 +19,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<ConversationListPage />} />
+          <Route path="conversation/:id" element={<div>对话详情</div>} />
           <Route path="import" element={<ImportPage />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="settings" element={<SettingsPage />} />
