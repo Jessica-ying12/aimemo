@@ -9,6 +9,8 @@
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:mac:dev": "electron-vite build && electron-builder --mac --dir",
     "preview": "electron-vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
@@ -61,7 +63,8 @@
     "prettier": "^3.8.3",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
-    "vite": "^8.0.14"
+    "vite": "^8.0.14",
+    "vitest": "^4.1.7"
   },
   "dependencies": {
     "better-sqlite3": "^12.10.0",
