@@ -5,16 +5,28 @@ interface AppState {
   sidebarCollapsed: boolean;
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   toggleSidebar: () => void;
+  initTheme: () => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
-  theme: 'system',
+export const useAppStore = create<AppState>((set, get) => ({
+  theme: (localStorage.getItem('theme') as 'light' | 'dark' | 'system') || 'system',
   sidebarCollapsed: false,
   setTheme: (theme) => {
     set({ theme });
+    localStorage.setItem('theme', theme);
     applyTheme(theme);
   },
   toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
+  initTheme: () => {
+    const theme = get().theme;
+    applyTheme(theme);
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (get().theme === 'system') {
+        applyTheme('system');
+      }
+    });
+  },
 }));
 
 function applyTheme(theme: 'light' | 'dark' | 'system') {

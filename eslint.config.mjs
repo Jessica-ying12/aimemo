@@ -26,6 +26,7 @@ export default [
         clearInterval: 'readonly',
         document: 'readonly',
         window: 'readonly',
+        localStorage: 'readonly',
         Electron: 'readonly',
         NodeJS: 'readonly',
       },
