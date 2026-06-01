@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
+    "build:mac": "electron-vite build && electron-builder --mac",
+    "build:mac:dev": "electron-vite build && electron-builder --mac --dir",
     "preview": "electron-vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

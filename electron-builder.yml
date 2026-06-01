@@ -1,0 +1,34 @@
+appId: com.aimemo.app
+productName: AIMemo
+copyright: Copyright © 2026 AIMemo
+
+directories:
+  output: release
+  buildResources: resources
+
+files:
+  - out/**/*
+
+mac:
+  category: public.app-category.productivity
+  target:
+    - target: dmg
+      arch: [universal]
+    - target: zip
+      arch: [universal]
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+
+dmg:
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
+  window:
+    width: 540
+    height: 380
