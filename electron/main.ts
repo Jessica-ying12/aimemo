@@ -1,6 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import { join } from 'path';
 import { initDatabase, closeDatabase } from './services/database';
+import { initConfig } from './services/config';
 import { registerIpcHandlers } from './ipc-handlers';
 import { setupCollectors } from './services/collector/setup';
 import { collectorManager } from './services/collector/manager';
@@ -30,7 +31,11 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  const dbPath = join(app.getPath('userData'), 'data', 'aimemo.db');
+  const userData = app.getPath('userData');
+  const dbPath = join(userData, 'data', 'aimemo.db');
+  const configPath = join(userData, 'config.json');
+
+  initConfig(configPath);
   initDatabase(dbPath);
   setupCollectors();
   registerIpcHandlers();
