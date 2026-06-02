@@ -40,8 +40,8 @@ export function detectInstalledTools(): DetectedTool[] {
     {
       name: 'Kiro',
       source: 'kiro',
-      detected: existsSync(join(home, '.kiro')) || existsSync(join(appSupport, 'Kiro')),
-      paths: [join(home, '.kiro'), join(appSupport, 'Kiro')].filter((p) => existsSync(p)),
+      detected: existsSync(join(home, '.kiro')),
+      paths: [join(home, '.kiro')],
       description: 'AWS AI IDE',
     },
     {

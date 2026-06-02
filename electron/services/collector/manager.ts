@@ -29,17 +29,21 @@ class CollectorManager {
     const collectors = registry.getEnabled();
 
     for (const collector of collectors) {
-      const paths = collector.getDefaultPaths();
+      try {
+        const paths = collector.getDefaultPaths();
 
-      collector.on('new-conversation', (conv: ParsedConversation) => {
-        this.handleNewConversation(conv);
-      });
+        collector.on('new-conversation', (conv: ParsedConversation) => {
+          this.handleNewConversation(conv);
+        });
 
-      collector.on('updated-conversation', (conv: ParsedConversation) => {
-        this.handleUpdatedConversation(conv);
-      });
+        collector.on('updated-conversation', (conv: ParsedConversation) => {
+          this.handleUpdatedConversation(conv);
+        });
 
-      this.watcher.startWatching(collector, paths);
+        this.watcher.startWatching(collector, paths);
+      } catch (error: any) {
+        logger.error('collector-manager', `Failed to start ${collector.source}:`, error.message);
+      }
     }
 
     this.status = 'running';
