@@ -2,6 +2,8 @@ import { app, BrowserWindow } from 'electron';
 import { join } from 'path';
 import { initDatabase, closeDatabase } from './services/database';
 import { registerIpcHandlers } from './ipc-handlers';
+import { setupCollectors } from './services/collector/setup';
+import { collectorManager } from './services/collector/manager';
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -30,8 +32,13 @@ function createWindow() {
 app.whenReady().then(() => {
   const dbPath = join(app.getPath('userData'), 'data', 'aimemo.db');
   initDatabase(dbPath);
+  setupCollectors();
   registerIpcHandlers();
   createWindow();
+
+  setTimeout(() => {
+    collectorManager.start();
+  }, 3000);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -47,5 +54,6 @@ app.on('window-all-closed', () => {
 });
 
 app.on('will-quit', () => {
+  collectorManager.stop();
   closeDatabase();
 });
