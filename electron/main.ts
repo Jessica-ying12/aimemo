@@ -2,6 +2,7 @@ import { app, BrowserWindow } from 'electron';
 import { join } from 'path';
 import { initDatabase, closeDatabase } from './services/database';
 import { initConfig } from './services/config';
+import { aiService } from './services/ai';
 import { registerIpcHandlers } from './ipc-handlers';
 import { setupCollectors } from './services/collector/setup';
 import { collectorManager } from './services/collector/manager';
@@ -37,6 +38,7 @@ app.whenReady().then(() => {
 
   initConfig(configPath);
   initDatabase(dbPath);
+  aiService.initialize();
   setupCollectors();
   registerIpcHandlers();
   createWindow();

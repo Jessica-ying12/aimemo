@@ -15,6 +15,8 @@ import { readFile } from 'fs/promises';
 import { parseRawText, parseJSON, parseJSONL, parseMarkdown } from './services/parser';
 import { collectorManager } from './services/collector/manager';
 import { detectInstalledTools } from './services/collector/detector';
+import { aiService } from './services/ai';
+import { processConversation } from './services/processor';
 
 export function registerIpcHandlers() {
   // 对话
@@ -160,5 +162,19 @@ export function registerIpcHandlers() {
 
   registerHandler('collector:detect-tools', () => {
     return detectInstalledTools();
+  });
+
+  // AI 处理
+  registerHandler('ai:test-connection', () => {
+    return aiService.testConnection();
+  });
+
+  registerHandler('ai:process-conversation', (id: string) => {
+    if (!id || typeof id !== 'string') throw new Error('Invalid ID');
+    return processConversation(id);
+  });
+
+  registerHandler('ai:is-available', () => {
+    return aiService.isAvailable();
   });
 }

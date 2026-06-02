@@ -68,9 +68,11 @@
     "vitest": "^4.1.7"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.100.1",
     "better-sqlite3": "11.7.2",
     "chokidar": "^5.0.0",
     "dayjs": "^1.11.21",
+    "openai": "^6.39.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-markdown": "^10.1.0",
