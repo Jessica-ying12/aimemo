@@ -36,12 +36,18 @@ export class ClaudeCodeCollector extends BaseCollector {
         const stat = statSync(projectDir);
         if (!stat.isDirectory()) continue;
 
-        const convDir = join(projectDir, 'conversations');
-        if (!existsSync(convDir)) continue;
+        // JSONL 文件可能直接在项目目录中，也可能在 conversations/ 子目录中
+        const jsonlInRoot = readdirSync(projectDir).filter((f) => f.endsWith('.jsonl'));
+        for (const file of jsonlInRoot) {
+          files.push(join(projectDir, file));
+        }
 
-        const convFiles = readdirSync(convDir).filter((f) => f.endsWith('.jsonl'));
-        for (const file of convFiles) {
-          files.push(join(convDir, file));
+        const convDir = join(projectDir, 'conversations');
+        if (existsSync(convDir)) {
+          const convFiles = readdirSync(convDir).filter((f) => f.endsWith('.jsonl'));
+          for (const file of convFiles) {
+            files.push(join(convDir, file));
+          }
         }
       }
     } catch (error: any) {

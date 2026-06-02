@@ -22,7 +22,7 @@ export class FileWatcher {
         pollInterval: 100,
       },
       depth: 5,
-      ignored: ['**/node_modules/**', '**/.git/**'],
+      ignored: ['**/node_modules/**', '**/.git/**', '**/*.sock', '**/*.lock'],
     });
 
     watcher.on('add', (filePath) => this.handleFileEvent(collector, filePath, 'add'));
