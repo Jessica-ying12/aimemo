@@ -44,6 +44,9 @@ class CollectorManager {
 
     this.status = 'running';
     logger.info('collector-manager', `Started with ${collectors.length} collectors`);
+
+    // 首次启动自动全量扫描
+    this.fullScan();
   }
 
   pause() {
