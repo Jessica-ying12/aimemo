@@ -71,15 +71,21 @@ export class ClaudeCodeCollector extends BaseCollector {
         try {
           const item = JSON.parse(line);
 
-          if (item.type !== 'human' && item.type !== 'assistant') continue;
+          // Claude Code 格式：type 是 "user" 或 "assistant"，内容在 message 字段中
+          if (item.type !== 'user' && item.type !== 'assistant') continue;
 
-          const role = item.type === 'human' ? ('user' as const) : ('assistant' as const);
+          const role = item.type === 'user' ? ('user' as const) : ('assistant' as const);
           let msgContent: string;
 
-          if (typeof item.content === 'string') {
-            msgContent = item.content;
-          } else if (Array.isArray(item.content)) {
-            msgContent = item.content
+          // 用户消息：message.content 是字符串
+          // AI 消息：message.content 是数组 [{type:"text",text:"..."}]
+          const messageObj = item.message || item;
+          const content = messageObj.content;
+
+          if (typeof content === 'string') {
+            msgContent = content;
+          } else if (Array.isArray(content)) {
+            msgContent = content
               .filter((c: any) => c.type === 'text')
               .map((c: any) => c.text)
               .join('\n');
