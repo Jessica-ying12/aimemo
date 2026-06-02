@@ -13,6 +13,8 @@ import { tagsDB } from './services/database/tags';
 import { dialog } from 'electron';
 import { readFile } from 'fs/promises';
 import { parseRawText, parseJSON, parseJSONL, parseMarkdown } from './services/parser';
+import { collectorManager } from './services/collector/manager';
+import { detectInstalledTools } from './services/collector/detector';
 
 export function registerIpcHandlers() {
   // 对话
@@ -137,32 +139,26 @@ export function registerIpcHandlers() {
 
   // 采集器
   registerHandler('collector:status', () => {
-    const { collectorManager } = require('./services/collector/manager');
     return collectorManager.getStatus();
   });
 
   registerHandler('collector:sources', () => {
-    const { collectorManager } = require('./services/collector/manager');
     return collectorManager.getSourceStatuses();
   });
 
   registerHandler('collector:start', () => {
-    const { collectorManager } = require('./services/collector/manager');
     return collectorManager.start();
   });
 
   registerHandler('collector:pause', () => {
-    const { collectorManager } = require('./services/collector/manager');
     return collectorManager.pause();
   });
 
   registerHandler('collector:full-scan', () => {
-    const { collectorManager } = require('./services/collector/manager');
     return collectorManager.fullScan();
   });
 
   registerHandler('collector:detect-tools', () => {
-    const { detectInstalledTools } = require('./services/collector/detector');
     return detectInstalledTools();
   });
 }
