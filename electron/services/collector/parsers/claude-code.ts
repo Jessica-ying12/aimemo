@@ -78,17 +78,23 @@ export class ClaudeCodeCollector extends BaseCollector {
           let msgContent: string;
 
           // 用户消息：message.content 是字符串
-          // AI 消息：message.content 是数组 [{type:"text",text:"..."}]
+          // AI 消息：message.content 是数组 [{type:"text",text:"..."}, {type:"thinking",thinking:"..."}]
           const messageObj = item.message || item;
           const content = messageObj.content;
 
           if (typeof content === 'string') {
             msgContent = content;
           } else if (Array.isArray(content)) {
-            msgContent = content
-              .filter((c: any) => c.type === 'text')
-              .map((c: any) => c.text)
-              .join('\n');
+            // 优先取 text 类型，没有则取 thinking 类型
+            const textParts = content.filter((c: any) => c.type === 'text').map((c: any) => c.text);
+            if (textParts.length > 0) {
+              msgContent = textParts.join('\n');
+            } else {
+              const thinkingParts = content
+                .filter((c: any) => c.type === 'thinking')
+                .map((c: any) => c.thinking);
+              msgContent = thinkingParts.join('\n');
+            }
           } else {
             continue;
           }
