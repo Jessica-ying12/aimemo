@@ -11,6 +11,9 @@ export default defineConfig({
           index: resolve(__dirname, 'electron/main.ts'),
         },
         external: ['electron', 'better-sqlite3'],
+        output: {
+          format: 'es',
+        },
       },
     },
   },
@@ -21,6 +24,9 @@ export default defineConfig({
           index: resolve(__dirname, 'electron/preload.ts'),
         },
         external: ['electron'],
+        output: {
+          format: 'cjs',
+        },
       },
     },
   },
