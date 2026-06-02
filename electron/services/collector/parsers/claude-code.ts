@@ -66,34 +66,39 @@ export class ClaudeCodeCollector extends BaseCollector {
 
       const messages: ParsedConversation['messages'] = [];
       let firstTimestamp: string | undefined;
+      let title: string | undefined;
 
       for (const line of lines) {
         try {
           const item = JSON.parse(line);
 
-          // Claude Code 格式：type 是 "user" 或 "assistant"，内容在 message 字段中
+          // 提取 AI 生成的标题
+          if (item.type === 'ai-title' && item.aiTitle) {
+            title = item.aiTitle;
+            continue;
+          }
+
+          // 只处理 user 和 assistant 消息
           if (item.type !== 'user' && item.type !== 'assistant') continue;
 
           const role = item.type === 'user' ? ('user' as const) : ('assistant' as const);
           let msgContent: string;
 
           // 用户消息：message.content 是字符串
-          // AI 消息：message.content 是数组 [{type:"text",text:"..."}, {type:"thinking",thinking:"..."}]
+          // AI 消息：message.content 是数组 [{type:"text",text:"..."}]
           const messageObj = item.message || item;
           const content = messageObj.content;
 
           if (typeof content === 'string') {
             msgContent = content;
           } else if (Array.isArray(content)) {
-            // 优先取 text 类型，没有则取 thinking 类型
+            // 只取 text 类型（用户可见的回复），跳过 thinking（内部思考）和 tool_use
             const textParts = content.filter((c: any) => c.type === 'text').map((c: any) => c.text);
             if (textParts.length > 0) {
               msgContent = textParts.join('\n');
             } else {
-              const thinkingParts = content
-                .filter((c: any) => c.type === 'thinking')
-                .map((c: any) => c.thinking);
-              msgContent = thinkingParts.join('\n');
+              // 没有 text 内容的 assistant 消息跳过（纯 thinking 或纯 tool_use）
+              continue;
             }
           } else {
             continue;
@@ -124,6 +129,7 @@ export class ClaudeCodeCollector extends BaseCollector {
       return {
         source: 'claude-code',
         externalId: basename(filePath, '.jsonl'),
+        title,
         messages,
         metadata: {
           filePath,
