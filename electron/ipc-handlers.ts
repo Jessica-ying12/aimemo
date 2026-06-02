@@ -134,4 +134,35 @@ export function registerIpcHandlers() {
 
     return results;
   });
+
+  // 采集器
+  registerHandler('collector:status', () => {
+    const { collectorManager } = require('./services/collector/manager');
+    return collectorManager.getStatus();
+  });
+
+  registerHandler('collector:sources', () => {
+    const { collectorManager } = require('./services/collector/manager');
+    return collectorManager.getSourceStatuses();
+  });
+
+  registerHandler('collector:start', () => {
+    const { collectorManager } = require('./services/collector/manager');
+    return collectorManager.start();
+  });
+
+  registerHandler('collector:pause', () => {
+    const { collectorManager } = require('./services/collector/manager');
+    return collectorManager.pause();
+  });
+
+  registerHandler('collector:full-scan', () => {
+    const { collectorManager } = require('./services/collector/manager');
+    return collectorManager.fullScan();
+  });
+
+  registerHandler('collector:detect-tools', () => {
+    const { detectInstalledTools } = require('./services/collector/detector');
+    return detectInstalledTools();
+  });
 }

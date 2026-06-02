@@ -19,6 +19,7 @@ export default [
       globals: {
         console: 'readonly',
         process: 'readonly',
+        require: 'readonly',
         __dirname: 'readonly',
         setTimeout: 'readonly',
         clearTimeout: 'readonly',

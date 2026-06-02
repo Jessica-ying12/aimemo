@@ -5,6 +5,7 @@ const navItems = [
   { path: '/', label: '对话', icon: '💬' },
   { path: '/import', label: '导入', icon: '📥' },
   { path: '/search', label: '搜索', icon: '🔍' },
+  { path: '/collector', label: '采集', icon: '📡' },
   { path: '/settings', label: '设置', icon: '⚙️' },
 ];
 

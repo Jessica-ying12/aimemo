@@ -51,4 +51,12 @@ export const api = {
     paste: (text: string) => invoke<Conversation>('import:paste', text),
     file: () => invoke<Conversation[] | null>('import:file'),
   },
+  collector: {
+    status: () => invoke<string>('collector:status'),
+    sources: () => invoke<any[]>('collector:sources'),
+    start: () => invoke<void>('collector:start'),
+    pause: () => invoke<void>('collector:pause'),
+    fullScan: () => invoke<{ total: number }>('collector:full-scan'),
+    detectTools: () => invoke<any[]>('collector:detect-tools'),
+  },
 };
