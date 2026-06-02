@@ -72,4 +72,23 @@ export const migrations: Migration[] = [
       `);
     },
   },
+  {
+    version: 2,
+    name: 'add_sync_state',
+    up: (db) => {
+      db.exec(`
+        CREATE TABLE sync_state (
+          file_path TEXT PRIMARY KEY,
+          last_modified TEXT NOT NULL,
+          last_synced TEXT NOT NULL,
+          source TEXT NOT NULL,
+          conversation_id TEXT,
+          file_hash TEXT,
+          FOREIGN KEY (conversation_id) REFERENCES conversations(id)
+        );
+
+        CREATE INDEX idx_sync_state_source ON sync_state(source);
+      `);
+    },
+  },
 ];
