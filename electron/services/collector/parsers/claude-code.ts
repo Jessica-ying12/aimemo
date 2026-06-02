@@ -30,31 +30,29 @@ export class ClaudeCodeCollector extends BaseCollector {
     if (!existsSync(basePath)) return files;
 
     try {
-      const projects = readdirSync(basePath);
-      for (const project of projects) {
-        const projectDir = join(basePath, project);
-        const stat = statSync(projectDir);
-        if (!stat.isDirectory()) continue;
-
-        // JSONL 文件可能直接在项目目录中，也可能在 conversations/ 子目录中
-        const jsonlInRoot = readdirSync(projectDir).filter((f) => f.endsWith('.jsonl'));
-        for (const file of jsonlInRoot) {
-          files.push(join(projectDir, file));
-        }
-
-        const convDir = join(projectDir, 'conversations');
-        if (existsSync(convDir)) {
-          const convFiles = readdirSync(convDir).filter((f) => f.endsWith('.jsonl'));
-          for (const file of convFiles) {
-            files.push(join(convDir, file));
-          }
-        }
-      }
+      this.walkDir(basePath, files, 0);
     } catch (error: any) {
       logger.error('claude-code', 'Failed to discover files:', error.message);
     }
 
     return files;
+  }
+
+  private walkDir(dir: string, files: string[], depth: number) {
+    if (depth > 4) return;
+    try {
+      const entries = readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = join(dir, entry.name);
+        if (entry.isDirectory()) {
+          this.walkDir(fullPath, files, depth + 1);
+        } else if (entry.isFile() && entry.name.endsWith('.jsonl')) {
+          files.push(fullPath);
+        }
+      }
+    } catch {
+      // permission error, skip
+    }
   }
 
   async parseFile(filePath: string): Promise<ParsedConversation | null> {
